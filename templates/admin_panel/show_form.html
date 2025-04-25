@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{% if object %}Edit Show - {{ object.title }}{% else %}Create New Show{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">
+                        {% if object %}Edit Show{% else %}Create New Show{% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" onsubmit="return validateForm(this);">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   value="{{ object.title|default:'' }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="4" required>{{ object.description|default:'' }}</textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="date" class="form-label">Date and Time</label>
+                                    <input type="datetime-local" class="form-control" id="date" name="date" 
+                                           value="{{ object.date|date:'Y-m-d\TH:i'|default:'' }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="venue" class="form-label">Venue</label>
+                                    <input type="text" class="form-control" id="venue" name="venue" 
+                                           value="{{ object.venue|default:'' }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="total_seats" class="form-label">Total Seats</label>
+                                    <input type="number" class="form-control" id="total_seats" name="total_seats" 
+                                           value="{{ object.total_seats|default:'' }}" min="1" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="available_seats" class="form-label">Available Seats</label>
+                                    <input type="number" class="form-control" id="available_seats" name="available_seats" 
+                                           value="{{ object.available_seats|default:'' }}" min="0" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="price" name="price" 
+                                               value="{{ object.price|default:'' }}" min="0" step="0.01" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Show Image</label>
+                            {% if object.image %}
+                            <div class="mb-2">
+                                <img src="{{ object.image.url }}" alt="{{ object.title }}" class="img-thumbnail" style="max-height: 200px;">
+                            </div>
+                            {% endif %}
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                {% if object %}Update Show{% else %}Create Show{% endif %}
+                            </button>
+                            <a href="{% url 'admin_panel:shows' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const totalSeatsInput = document.getElementById('total_seats');
+    const availableSeatsInput = document.getElementById('available_seats');
+
+    totalSeatsInput.addEventListener('input', function() {
+        const totalSeats = parseInt(this.value) || 0;
+        availableSeatsInput.max = totalSeats;
+        if (parseInt(availableSeatsInput.value) > totalSeats) {
+            availableSeatsInput.value = totalSeats;
+        }
+    });
+});
+</script>
+{% endblock %} 

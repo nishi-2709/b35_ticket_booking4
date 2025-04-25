@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ show.title }} - Ticket Booking System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                {% if show.image %}
+                <img src="{{ show.image.url }}" class="card-img-top" alt="{{ show.title }}">
+                {% else %}
+                <img src="{% static 'images/default-show.jpg' %}" class="card-img-top" alt="Default Show Image">
+                {% endif %}
+                <div class="card-body">
+                    <h2 class="card-title">{{ show.title }}</h2>
+                    <p class="card-text">{{ show.description }}</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5>Event Details</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>Date:</strong> {{ show.date|date:"F j, Y" }}</li>
+                                <li><strong>Time:</strong> {{ show.date|date:"H:i" }}</li>
+                                <li><strong>Venue:</strong> {{ show.venue }}</li>
+                                <li><strong>Price:</strong> ${{ show.price }}</li>
+                                <li><strong>Available Seats:</strong> {{ show.available_seats }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Booking Information</h5>
+                            {% if is_available %}
+                                {% if user.is_authenticated %}
+                                    {% if user_bookings %}
+                                    <div class="alert alert-info">
+                                        You have already booked tickets for this show.
+                                        <a href="{% url 'bookings:history' %}" class="alert-link">View your bookings</a>
+                                    </div>
+                                    {% else %}
+                                    <a href="{% url 'bookings:create' show.pk %}" class="btn btn-primary">Book Tickets</a>
+                                    {% endif %}
+                                {% else %}
+                                <div class="alert alert-warning">
+                                    Please <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="alert-link">login</a> to book tickets.
+                                </div>
+                                {% endif %}
+                            {% else %}
+                            <div class="alert alert-danger">
+                                {% if show.available_seats <= 0 %}
+                                    Sorry, this show is sold out.
+                                {% else %}
+                                    Sorry, booking is no longer available for this show.
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Seat Map</h5>
+                </div>
+                <div class="card-body">
+                    <div class="seat-grid">
+                        {% for i in "12345678910"|make_list %}
+                            {% for j in "12345678910"|make_list %}
+                                <div class="seat {% if forloop.parentloop.counter|add:forloop.counter < show.available_seats %}available{% else %}booked{% endif %}"
+                                     data-seat-number="{{ forloop.parentloop.counter }}{{ forloop.counter }}">
+                                    {{ forloop.parentloop.counter }}{{ forloop.counter }}
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-between">
+                            <small><span class="badge bg-success">■</span> Available</small>
+                            <small><span class="badge bg-danger">■</span> Booked</small>
+                            <small><span class="badge bg-primary">■</span> Selected</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

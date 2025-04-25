@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book Tickets - {{ show.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Book Tickets for {{ show.title }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Show Details</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>Date:</strong> {{ show.date|date:"F j, Y" }}</li>
+                                <li><strong>Time:</strong> {{ show.date|date:"H:i" }}</li>
+                                <li><strong>Venue:</strong> {{ show.venue }}</li>
+                                <li><strong>Price per ticket:</strong> ${{ show.price }}</li>
+                                <li><strong>Available Seats:</strong> {{ show.available_seats }}</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form method="post" onsubmit="return validateForm(this);">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="number_of_tickets" class="form-label">Number of Tickets</label>
+                            <input type="number" class="form-control" id="number_of_tickets" name="number_of_tickets" 
+                                   min="1" max="{{ show.available_seats }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Select Seats</label>
+                            <div class="seat-grid">
+                                {% for i in "12345678910"|make_list %}
+                                    {% for j in "12345678910"|make_list %}
+                                        <div class="seat {% if forloop.parentloop.counter|add:forloop.counter < show.available_seats %}available{% else %}booked{% endif %}"
+                                             data-seat-number="{{ forloop.parentloop.counter }}{{ forloop.counter }}">
+                                            {{ forloop.parentloop.counter }}{{ forloop.counter }}
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" name="seat_numbers" id="seat_numbers" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <small><span class="badge bg-success">■</span> Available</small>
+                                <small><span class="badge bg-danger">■</span> Booked</small>
+                                <small><span class="badge bg-primary">■</span> Selected</small>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <div id="booking-summary">
+                                <strong>Booking Summary:</strong>
+                                <p class="mb-0">Total Price: $<span id="total-price">0.00</span></p>
+                                <p class="mb-0">Selected Seats: <span id="selected-seats">None</span></p>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Confirm Booking</button>
+                            <a href="{% url 'shows:detail' show.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ticketInput = document.getElementById('number_of_tickets');
+    const totalPriceSpan = document.getElementById('total-price');
+    const selectedSeatsSpan = document.getElementById('selected-seats');
+    const pricePerTicket = {{ show.price }};
+
+    ticketInput.addEventListener('input', function() {
+        updateTotalPrice();
+    });
+
+    function updateTotalPrice() {
+        const numberOfTickets = parseInt(ticketInput.value) || 0;
+        const totalPrice = (numberOfTickets * pricePerTicket).toFixed(2);
+        totalPriceSpan.textContent = totalPrice;
+    }
+
+    function updateSelectedSeats() {
+        const seats = selectedSeats.join(', ');
+        selectedSeatsSpan.textContent = seats || 'None';
+        document.getElementById('seat_numbers').value = selectedSeats.join(',');
+    }
+});
+</script>
+{% endblock %} 

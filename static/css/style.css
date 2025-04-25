@@ -1,0 +1,84 @@
+/* General Styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Show Cards */
+.show-card {
+    transition: transform 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.show-card:hover {
+    transform: translateY(-5px);
+}
+
+.show-card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Booking Form */
+.booking-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Seat Selection */
+.seat-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.seat {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.seat.available {
+    background-color: #28a745;
+    color: white;
+}
+
+.seat.selected {
+    background-color: #007bff;
+    color: white;
+}
+
+.seat.booked {
+    background-color: #dc3545;
+    color: white;
+    cursor: not-allowed;
+}
+
+/* Admin Panel */
+.admin-dashboard {
+    padding: 20px;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .seat-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+} 

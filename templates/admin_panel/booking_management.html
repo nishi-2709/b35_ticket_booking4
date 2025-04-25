@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Management - Ticket Booking System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Booking Management</h2>
+        </div>
+        <div class="col-md-4">
+            <form method="get" class="d-flex">
+                <select name="show" class="form-select me-2">
+                    <option value="">All Shows</option>
+                    {% for show in shows %}
+                    <option value="{{ show.pk }}" {% if request.GET.show|add:"0" == show.pk %}selected{% endif %}>
+                        {{ show.title }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
+        </div>
+    </div>
+
+    {% if bookings %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Show</th>
+                            <th>User</th>
+                            <th>Tickets</th>
+                            <th>Total Price</th>
+                            <th>Booking Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td>#{{ booking.id }}</td>
+                            <td>{{ booking.show.title }}</td>
+                            <td>{{ booking.user.email }}</td>
+                            <td>{{ booking.number_of_tickets }}</td>
+                            <td>${{ booking.total_price }}</td>
+                            <td>{{ booking.booking_date|date:"M j, Y H:i" }}</td>
+                            <td>
+                                <span class="badge {% if booking.is_confirmed %}bg-success{% else %}bg-warning{% endif %}">
+                                    {% if booking.is_confirmed %}Confirmed{% else %}Pending{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'bookings:detail' booking.pk %}" class="btn btn-sm btn-info" title="View">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if not booking.is_confirmed %}
+                                    <button type="button" class="btn btn-sm btn-success" title="Confirm"
+                                            onclick="confirmBooking({{ booking.pk }})">
+                                        <i class="bi bi-check-circle"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if request.GET.show %}&show={{ request.GET.show }}{% endif %}">First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.show %}&show={{ request.GET.show }}{% endif %}">Previous</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.show %}&show={{ request.GET.show }}{% endif %}">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.show %}&show={{ request.GET.show }}{% endif %}">Last</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-info">
+        <p>No bookings found.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function confirmBooking(bookingId) {
+    if (confirm('Are you sure you want to confirm this booking?')) {
+        // You would implement the confirmation logic here
+        // This could be an AJAX call to a view that handles the confirmation
+        console.log('Confirming booking:', bookingId);
+    }
+}
+</script>
+{% endblock %} 

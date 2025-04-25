@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - Ticket Booking System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2>Admin Dashboard</h2>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Shows</h5>
+                    <h2 class="card-text">{{ total_shows }}</h2>
+                    <p class="mb-0">{{ upcoming_shows }} upcoming</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Bookings</h5>
+                    <h2 class="card-text">{{ total_bookings }}</h2>
+                    <p class="mb-0">All time</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Revenue</h5>
+                    <h2 class="card-text">${{ total_revenue|floatformat:2 }}</h2>
+                    <p class="mb-0">All time</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Upcoming Shows</h5>
+                    <h2 class="card-text">{{ upcoming_shows }}</h2>
+                    <p class="mb-0">Shows pending</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Shows</h5>
+                    <a href="{% url 'admin_panel:shows' %}" class="btn btn-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for show in shows|slice:":5" %}
+                        <a href="{% url 'shows:detail' show.pk %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ show.title }}</h6>
+                                <small>{{ show.date|date:"M j, Y" }}</small>
+                            </div>
+                            <p class="mb-1">{{ show.venue }}</p>
+                            <small>{{ show.available_seats }} seats available</small>
+                        </a>
+                        {% empty %}
+                        <p class="text-muted">No shows available</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Bookings</h5>
+                    <a href="{% url 'admin_panel:bookings' %}" class="btn btn-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for booking in bookings|slice:":5" %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ booking.show.title }}</h6>
+                                <small>{{ booking.booking_date|date:"M j, Y" }}</small>
+                            </div>
+                            <p class="mb-1">{{ booking.user.email }}</p>
+                            <small>{{ booking.number_of_tickets }} tickets - ${{ booking.total_price }}</small>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted">No bookings available</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

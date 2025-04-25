@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Details - Ticket Booking System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Booking Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Show Information</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>Show:</strong> {{ booking.show.title }}</li>
+                                <li><strong>Date:</strong> {{ booking.show.date|date:"F j, Y" }}</li>
+                                <li><strong>Time:</strong> {{ booking.show.date|date:"H:i" }}</li>
+                                <li><strong>Venue:</strong> {{ booking.show.venue }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Booking Information</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>Booking ID:</strong> #{{ booking.id }}</li>
+                                <li><strong>Booking Date:</strong> {{ booking.booking_date|date:"F j, Y H:i" }}</li>
+                                <li><strong>Number of Tickets:</strong> {{ booking.number_of_tickets }}</li>
+                                <li><strong>Total Price:</strong> ${{ booking.total_price }}</li>
+                                <li><strong>Status:</strong> 
+                                    {% if booking.is_confirmed %}
+                                    <span class="badge bg-success">Confirmed</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h5>Seat Information</h5>
+                        <div class="seat-grid-preview">
+                            {% with seat_list=booking.seat_numbers|split:"," %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for seat in seat_list %}
+                                <div class="seat selected">{{ seat }}</div>
+                                {% endfor %}
+                            </div>
+                            {% endwith %}
+                        </div>
+                    </div>
+
+                    {% if booking.show.date > now %}
+                    <div class="alert alert-info mt-4">
+                        <h5>Important Information</h5>
+                        <ul>
+                            <li>Please arrive at least 30 minutes before the show.</li>
+                            <li>Bring a valid ID for verification.</li>
+                            <li>Your booking confirmation will be sent to your email.</li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'bookings:history' %}" class="btn btn-secondary">Back to My Bookings</a>
+                        {% if booking.show.date > now %}
+                        <button class="btn btn-primary" onclick="window.print()">Print Ticket</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
